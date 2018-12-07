@@ -7,8 +7,15 @@ def Map_Generator(x_range,y_range,window_width,window_height):
             self.TrackUp = ""
             self.TrackUpAndRight = ""
             self.TrackDownAndRight = ""
-            self.neighbors = []
+            self.riverUp = 0
+            self.riverUpAndRight = 0
+            self.riverDownAndRight = 0
+            self.neighbors = [0,0,0,0,0,0]
             self.isReal = 1
+            self.cumulativeCost = 0
+            self.cashCost = 0
+            self.movecost = 0
+            self.turnRed = 0
 
     class mountain(milepost):
         def __init__(self):
