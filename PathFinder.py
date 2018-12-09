@@ -74,6 +74,8 @@ def PathFinder(startPoint,endPoint):
                 thisPoint.moveCost = lastPoint.moveCost + 1
                 thisPoint.heuristic = thisPoint.cashCost + thisPoint.moveCost + dist
                 openList.append(thisPoint)
+        if dist == 0:
+            break
 
         bestPoint = openList[0]
         for point in openList:
@@ -86,8 +88,6 @@ def PathFinder(startPoint,endPoint):
             return 0
         #
 
-        if dist == 0:
-            break
     finalList = [closedList[-1]]
     closedList.reverse()
     for point in closedList:
