@@ -14,18 +14,16 @@ class milepost:
         self.cost = 1
         self.xCoord = 0
         self.yCoord = 0
-        self.TrackUp = ""
-        self.TrackUpAndRight = ""
-        self.TrackDownAndRight = ""
-        self.riverUp = 0
-        self.riverUpAndRight = 0
-        self.riverDownAndRight = 0
+        self.colors = [0,0,0,0,0,0]
+        self.rivers = [0,0,0,0,0,0]
         self.neighbors = [0,0,0,0,0,0]
         self.isReal = 1
         self.cumulativeCost = 0
         self.cashCost = 0
-        self.movecost = 0
+        self.moveCost = 0
         self.turnRed = 0
+        self.parent = 0
+        self.heuristic = 1000000000000000
 
 class mountain(milepost):
     def __init__(self):
@@ -81,6 +79,7 @@ if __name__ == '__main__':
     EmpireBuilderWindow = pygame.display.set_mode(size)
     pygame.display.set_caption('Empire Builder, but like, a shittier version.')
     EmpireBuilderWindow.fill(oceanBlue)
+    PotentialPath = 0
 
 
 
@@ -118,36 +117,49 @@ if __name__ == '__main__':
             elif post.turnRed == 1:
                 pygame.draw.circle(EmpireBuilderWindow, redColor, (post.xCoord, post.yCoord), MilePostRadius, 0)
 
+        if PotentialPath != 0:
+            for point in PotentialPath:
+                for n in range (0,6,1):
+                    if point.colors[n] != 0 and point.neighbors[n] != 0:
+                        pygame.draw.line(EmpireBuilderWindow,point.colors[n],(point.xCoord,point.yCoord),(point.neighbors[n].xCoord, point.neighbors[n].yCoord))
+
         for post in ListOfBlankSpaces:
             pygame.draw.rect(EmpireBuilderWindow, white, (post.xCoord - XMilePostSpacing / 2, post.yCoord - YMilePostSpacing / 2, XMilePostSpacing, YMilePostSpacing))
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = 0
-                    sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and pygame.mouse.get_focused() == True:
-                    xMouse, yMouse = pygame.mouse.get_pos()
-                    for post in ListOfMileposts:
-                        if xMouse >= post.xCoord - MilePostRadius and xMouse <= post.xCoord + MilePostRadius and yMouse >= post.yCoord - MilePostRadius and yMouse <= post.yCoord + MilePostRadius:
-                            pygame.draw.circle(EmpireBuilderWindow, redColor, (post.xCoord, post.yCoord),MilePostRadius, 0)
-                            post.turnRed = 1
-                            print "I registered that click"
-                            NumSelectedMilePosts += 1
-                            if NumSelectedMilePosts > 1:
-                                endingPoint = post
-                                # PathFinder(startingPoint, endingPoint, ListOfMileposts)
-                                # NumSelectedMilePosts = 0
-                            else:
-                                startingPoint = post
+        if PotentialPath != 0:
+            for point in PotentialPath:
+                for n in range(0, 6, 1):
+                    if point.colors[n] != 0 and point.neighbors[n] != 0:
+                        pygame.draw.line(EmpireBuilderWindow, point.colors[n], (point.xCoord, point.yCoord),(point.neighbors[n].xCoord, point.neighbors[n].yCoord))
 
-                if event.type == pygame.MOUSEBUTTONUP:
-                    None
-                if event.type == pygame.MOUSEMOTION:
-                    None
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = 0
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and pygame.mouse.get_focused() == True:
+                xMouse, yMouse = pygame.mouse.get_pos()
+                for post in ListOfMileposts:
+                    if xMouse >= post.xCoord - MilePostRadius and xMouse <= post.xCoord + MilePostRadius and yMouse >= post.yCoord - MilePostRadius and yMouse <= post.yCoord + MilePostRadius:
+                        pygame.draw.circle(EmpireBuilderWindow, redColor, (post.xCoord, post.yCoord),MilePostRadius, 0)
+                        post.turnRed = 1
+                        print "I registered that click"
+                        NumSelectedMilePosts += 1
+                        if NumSelectedMilePosts > 1:
+                            endingPoint = post
+                            PotentialPath = PathFinder(startingPoint, endingPoint)
+                            print 'returned from PathFinder'
+                            # NumSelectedMilePosts = 0
+                        else:
+                            startingPoint = post
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                None
+            if event.type == pygame.MOUSEMOTION:
+                None
 
         correction = 1
-        for neighbor in ListOfMileposts[10].neighbors:
-            if neighbor != 0:
-                 pygame.draw.line(EmpireBuilderWindow, redColor, (ListOfMileposts[10].xCoord - correction,ListOfMileposts[10].yCoord - correction),(neighbor.xCoord - correction,neighbor.yCoord - correction),2)
+        # for neighbor in ListOfMileposts[10].neighbors:
+        #     if neighbor != 0:
+        #          pygame.draw.line(EmpireBuilderWindow, redColor, (ListOfMileposts[10].xCoord - correction,ListOfMileposts[10].yCoord - correction),(neighbor.xCoord - correction,neighbor.yCoord - correction),2)
         # pygame.draw.line(EmpireBuilderWindow,black,(ListOfMileposts[8].xCoord - correction,ListOfMileposts[8].yCoord - correction),(ListOfMileposts[11].xCoord - correction,ListOfMileposts[11].yCoord - correction),2)
         pygame.display.flip()
