@@ -4,7 +4,7 @@ def Neighbors_Generator(ListOfMileposts,xMilePostSpacing,yMilePostSpacing):
             self.cost = 1
             self.xCoord = 0
             self.yCoord = 0
-            self.colors = [0, 0, 0, 0, 0, 0]
+            self.colors = [0,0,0,0,0,0]
             self.rivers = [0, 0, 0, 0, 0, 0]
             self.neighbors = [0, 0, 0, 0, 0, 0]
             self.isReal = 1
@@ -53,22 +53,22 @@ def Neighbors_Generator(ListOfMileposts,xMilePostSpacing,yMilePostSpacing):
             y1 = post.yCoord
             x2 = potentialNeighbor.xCoord
             y2 = potentialNeighbor.yCoord
-            if x1 == x2 and y1 + 2*yMilePostSpacing == y2:
+            if x1 == x2 and y1 - 2*yMilePostSpacing == y2:
                 post.neighbors[0] = potentialNeighbor
                 #Neighbor is directly above
-            if x1 + xMilePostSpacing == x2 and y1 + yMilePostSpacing == y2:
+            if x1 + xMilePostSpacing == x2 and y1 - yMilePostSpacing == y2:
                 post.neighbors[1] = potentialNeighbor
                 #Neighbor is above and diaganol to the right
-            if x1 + xMilePostSpacing == x2 and y1 - yMilePostSpacing == y2:
+            if x1 + xMilePostSpacing == x2 and y1 + yMilePostSpacing == y2:
                 post.neighbors[2] = potentialNeighbor
                 #Neighbor is below and diaganol to the right
-            if x1 == x2 and y1 - 2*yMilePostSpacing == y2:
+            if x1 == x2 and y1 + 2*yMilePostSpacing == y2:
                 post.neighbors[3] = potentialNeighbor
                 #Neighbor is directly below
-            if x1 - xMilePostSpacing == x2 and y1 - yMilePostSpacing == y2:
+            if x1 - xMilePostSpacing == x2 and y1 + yMilePostSpacing == y2:
                 post.neighbors[4] = potentialNeighbor
                 #Neighbor is below and to the left
-            if x1 - xMilePostSpacing == x2 and y1 + yMilePostSpacing == y2:
+            if x1 - xMilePostSpacing == x2 and y1 - yMilePostSpacing == y2:
                 post.neighbors[5] = potentialNeighbor
                 #Neighbor is above and to the left
 
