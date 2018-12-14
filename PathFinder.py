@@ -78,11 +78,6 @@ def PathFinder(startPoint,endPoint,testColor):
 
                 thisPoint.parent = lastPoint
                 dist = DistFormula(thisPoint,endPoint)
-                if dist == 0:
-                    closedList.append(thisPoint)
-                    break
-                    #Checking to see if we made it to the end point. If we did, then we don't need to evaluate anything
-                    #else.
                 thisPoint.cashCost = lastPoint.cashCost + thisPoint.cost + lastPoint.rivers[n]
                 thisPoint.moveCost = lastPoint.moveCost + 1
                 thisPoint.heuristic = thisPoint.cashCost + thisPoint.moveCost + dist + lastPoint.heuristic
@@ -90,6 +85,12 @@ def PathFinder(startPoint,endPoint,testColor):
                 #be able to search for the cheapest monetary cost between points A and B, or the quickest move cost.
                 #For now, one move is weighted equal to $1.
                 openList.append(thisPoint)
+
+                if dist == 0:
+                    closedList.append(thisPoint)
+                    break
+                    #Checking to see if we made it to the end point. If we did, then we don't need to evaluate anything
+                    #else.
         if dist == 0:
             break
             #The first break only exits the for loop. This one gets us out of the infinite while loop.
@@ -128,5 +129,6 @@ def PathFinder(startPoint,endPoint,testColor):
     finalList.reverse()
     for point in closedList:
         point.parent = 0
+    print finalList[0].cashCost
     return
 

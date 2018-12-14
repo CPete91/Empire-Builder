@@ -1,4 +1,5 @@
-import sys
+import sys, math
+from math import *
 
 import pygame
 
@@ -94,6 +95,8 @@ if __name__ == '__main__':
     PlayerList = [player()]
     PlayerList[-1].color = black
     PlayerList[-1].testColor = TestYellow
+    zoomFactor = 0
+    zoomIncrement = 0.05
 
 
     running = 1
@@ -107,21 +110,20 @@ if __name__ == '__main__':
         for post in ListOfMileposts:
 
 
-            pygame.draw.rect(EmpireBuilderWindow, white, (post.xCoord - XMilePostSpacing/2, post.yCoord - YMilePostSpacing/2, XMilePostSpacing, YMilePostSpacing))
+            pygame.draw.rect(EmpireBuilderWindow, white, (math.floor((post.xCoord - XMilePostSpacing/2)*(1+zoomFactor)), math.floor((post.yCoord - YMilePostSpacing/2)*(1+zoomFactor)), math.ceil((1 + zoomFactor) * XMilePostSpacing), math.ceil((1 + zoomFactor) *YMilePostSpacing)))
             if post.turnRed == 0:
-                pygame.draw.circle(EmpireBuilderWindow,black, (post.xCoord, post.yCoord), MilePostRadius,0)
+                pygame.draw.circle(EmpireBuilderWindow,black, (int(post.xCoord * (1+ zoomFactor)), int(post.yCoord * (1 + zoomFactor))), int(MilePostRadius * (1 + zoomFactor)),0)
             elif post.turnRed == 1:
-                pygame.draw.circle(EmpireBuilderWindow, redColor, (post.xCoord, post.yCoord), MilePostRadius, 0)
+                pygame.draw.circle(EmpireBuilderWindow, redColor, (int(post.xCoord * (1+ zoomFactor)), int(post.yCoord * (1 + zoomFactor))), int(MilePostRadius * (1 + zoomFactor)),0)
 
         for post in ListOfBlankSpaces:
-            pygame.draw.rect(EmpireBuilderWindow, white, (post.xCoord - XMilePostSpacing / 2, post.yCoord - YMilePostSpacing / 2, XMilePostSpacing, YMilePostSpacing))
-
+            pygame.draw.rect(EmpireBuilderWindow, white, (math.floor((post.xCoord - XMilePostSpacing/2)*(1+zoomFactor)), math.floor((post.yCoord - YMilePostSpacing/2)*(1+zoomFactor)), math.ceil((1 + zoomFactor) * XMilePostSpacing), math.ceil((1 + zoomFactor) *YMilePostSpacing)))
 
         for post in ListOfMileposts:
             for n in range (0,6):
                 if post.colors[n] != 0:
 
-                    pygame.draw.line(EmpireBuilderWindow, post.colors[n],(post.xCoord - correction, post.yCoord - correction),(post.neighbors[n].xCoord - correction, post.neighbors[n].yCoord - correction))
+                    pygame.draw.line(EmpireBuilderWindow, post.colors[n],int(((post.xCoord - correction)*(1 + zoomFactor)), int((post.yCoord - correction)*(1 + zoomFactor))),int(((post.neighbors[n].xCoord - correction)*(1 + zoomFactor)), int((post.neighbors[n].yCoord - correction))*(1 + zoomFactor)))
 
 
         for event in pygame.event.get():
@@ -135,9 +137,6 @@ if __name__ == '__main__':
                         NumSelectedMilePosts += 1
 
                         if NumSelectedMilePosts ==1:
-                            print "Ran for first click condition"
-
-
                             for post2 in ListOfMileposts:
                                 post2.turnRed = 0
                                 post2.parent = 0
@@ -148,39 +147,64 @@ if __name__ == '__main__':
 
 
                         elif NumSelectedMilePosts ==  2:
-                            print "Ran for second click condition"
                             endingPoint = post
                             post.turnRed = 1
 
                             PathFinder(startingPoint, endingPoint,PlayerList[-1].testColor)
+                            print "This build will cost", endingPoint.cashCost, "million dollars."
+                            print "Building at 20 million dollars/turn, this will take", math.ceil(endingPoint.cashCost/20.0), "turns to build."
+                            print "This build will take", endingPoint.moveCost, "moves to complete."
+                            print "That translates to", math.ceil(endingPoint.moveCost/8.0), "turns of moving"
+
 
 
 
                         elif NumSelectedMilePosts == 3:
-                            print "Ran for third click condition"
 
                             for point in ListOfMileposts:
                                 point.turnRed = 0
-                            #Make all of the mileposts black again.
+                                point.cashCost = 0
+                                point.moveCost = 0
+                                point.heuristic = 0
+                            #Make all of the mileposts revert to their old states for pathfinder again.
 
                             if post.xCoord == endingPoint.xCoord and post.yCoord == endingPoint.yCoord:
                                 NumSelectedMilePosts = 0
                                 flag = 1
 
                             else:
-                                print "Went into the else statement"
                                 post.turnRed = 1
                                 endingPoint = 0
                                 startingPoint = post
                                 NumSelectedMilePosts = 1
                                 flag = 1
-
-                            #Literally just copying and pasting the code from the condition where I've only selected
-                            #one milepost. Tacked on an update in case we are selecting a new milepost so that it can
-                            #purge if need be.
-
-
                             endingPoint = 0
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4 and zoomFactor < 1:
+                for post in ListOfMileposts:
+                    pygame.draw.rect(EmpireBuilderWindow, oceanBlue, (
+                    math.floor((post.xCoord - XMilePostSpacing / 2) * (1 + zoomFactor)),
+                    math.floor((post.yCoord - YMilePostSpacing / 2) * (1 + zoomFactor)),
+                    math.ceil((1 + zoomFactor) * XMilePostSpacing), math.ceil((1 + zoomFactor) * YMilePostSpacing)))
+
+                for post in ListOfBlankSpaces:
+                    pygame.draw.rect(EmpireBuilderWindow, oceanBlue, (
+                    math.floor((post.xCoord - XMilePostSpacing / 2) * (1 + zoomFactor)),
+                    math.floor((post.yCoord - YMilePostSpacing / 2) * (1 + zoomFactor)),
+                    math.ceil((1 + zoomFactor) * XMilePostSpacing), math.ceil((1 + zoomFactor) * YMilePostSpacing)))
+
+                zoomFactor += zoomIncrement
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5 and zoomFactor > -1:
+                for post in ListOfMileposts:
+                    pygame.draw.rect(EmpireBuilderWindow, oceanBlue, ((
+                        int((post.xCoord - XMilePostSpacing / 2) * (1 + zoomFactor)),
+                        int((post.yCoord - YMilePostSpacing / 2) * (1 + zoomFactor))),
+                    (int((1 + zoomFactor) * XMilePostSpacing), int((1 + zoomFactor) * YMilePostSpacing))))
+
+                for post in ListOfBlankSpaces:
+                    pygame.draw.rect(EmpireBuilderWindow, oceanBlue,(int((post.xCoord - XMilePostSpacing / 2) * (1 + zoomFactor)),int((post.yCoord - YMilePostSpacing / 2) * (1 + zoomFactor)),int((1 + zoomFactor) * XMilePostSpacing),int((1 + zoomFactor) * YMilePostSpacing)))
+
+
+                zoomFactor -= zoomIncrement
 
 
 
@@ -189,30 +213,18 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEMOTION:
                 None
         if NumSelectedMilePosts == 0 and flag == 1:
-            print "Ran through the flagged part"
             for post in ListOfMileposts:
                 for n in range(0,6,1):
                     if post.colors[n] == PlayerList[-1].testColor:
-                        print "I tried to change a color"
                         post.colors[n] = PlayerList[-1].color
-                        print PlayerList[-1].color
-                        print post.colors[n]
-            print ListOfMileposts[0].colors[3]
             flag = 0
 
 
         if NumSelectedMilePosts == 1 and flag == 1:
-            print "Ran through the second flagged part"
             for post in ListOfMileposts:
                 for n in range (0,6):
                     if post.colors[n] == PlayerList[-1].testColor:
-                        print "I tried to delete a value"
                         post.colors[n] = 0
             flag = 0
 
-
-        # for neighbor in ListOfMileposts[10].neighbors:
-        #     if neighbor != 0:
-        #          pygame.draw.line(EmpireBuilderWindow, redColor, (ListOfMileposts[10].xCoord - correction,ListOfMileposts[10].yCoord - correction),(neighbor.xCoord - correction,neighbor.yCoord - correction),2)
-        # pygame.draw.line(EmpireBuilderWindow,black,(ListOfMileposts[8].xCoord - correction,ListOfMileposts[8].yCoord - correction),(ListOfMileposts[11].xCoord - correction,ListOfMileposts[11].yCoord - correction),2)
         pygame.display.flip()
