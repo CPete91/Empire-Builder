@@ -11,6 +11,7 @@ mouse_pressing = True
 pygame.init()
 
 
+# Hi
 class milepost:
     def __init__(self):
         self.cost = 1
